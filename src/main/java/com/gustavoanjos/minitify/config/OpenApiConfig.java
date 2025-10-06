@@ -27,7 +27,8 @@ public class OpenApiConfig {
                                 .name("MIT License")
                                 .url("https://opensource.org/licenses/MIT")))
                 .addSecurityItem(new SecurityRequirement()
-                        .addList("bearerAuth"))
+                        .addList("bearerAuth")
+                )
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth", new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)
@@ -35,4 +36,5 @@ public class OpenApiConfig {
                                 .bearerFormat("JWT")
                                 .description("JWT token authentication")));
     }
+
 }
