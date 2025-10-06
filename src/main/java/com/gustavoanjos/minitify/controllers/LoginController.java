@@ -6,6 +6,10 @@ import com.gustavoanjos.minitify.domain.product.user.Users;
 import com.gustavoanjos.minitify.domain.product.user.UserDTO;
 import com.gustavoanjos.minitify.domain.repositories.UserRepository;
 import com.gustavoanjos.minitify.domain.services.TokenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.springframework.http.HttpStatus;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Authentication", description = "Authentication endpoints for user login and registration")
 public class LoginController {
     public UserRepository repository;
     public final TokenService service;
@@ -28,6 +33,11 @@ public class LoginController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Operation(summary = "User login", description = "Authenticate user and return JWT token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login successful"),
+            @ApiResponse(responseCode = "400", description = "Invalid credentials")
+    })
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody @Validated LoginDTO data) {
         log.debug("Attempting login for email: {}", data.email());
@@ -41,6 +51,11 @@ public class LoginController {
         return ResponseEntity.ok(token);
     }
 
+    @Operation(summary = "User registration", description = "Register a new user account")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User registered successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid user data")
+    })
     @PostMapping("/register")
     public ResponseEntity<HttpStatus> register(@RequestBody @Validated UserDTO data) {
         log.debug("Attempting register for email: {}", data.email());

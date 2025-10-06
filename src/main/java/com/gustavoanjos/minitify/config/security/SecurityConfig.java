@@ -33,8 +33,9 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // allow all auth endpoints
                 .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/docs/**").permitAll()
+                .requestMatchers("/openapi.json").permitAll()
                 // TODO: remove before production
                 .requestMatchers(HttpMethod.POST, "/artists").hasRole(String.valueOf(Roles.ADMIN))
                 .anyRequest().authenticated()
