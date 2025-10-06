@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -50,21 +51,23 @@ public class ArtistController {
             @ApiResponse(responseCode = "200", description = "Artists retrieved successfully")
     })
     @GetMapping("/all")
-    public Collection<Artists> findAll() {
+    public Collection<Artists> findAll(@RequestParam(required = false) String genre) {
         log.info("Finding all artists");
-        return repository.findAll();
+        if (genre.isEmpty()) return repository.findAll();
+        return repository.findByGenre(genre);
     }
 
     @Operation(summary = "Delete artist", description = "Delete an artist by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Artist deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Artist not found")
+            @ApiResponse(responseCode = "404", description = "Artist not found"),
+            @ApiResponse(responseCode = "403", description = "Access denied - Admin role required"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteArtist(@PathVariable @Validated UUID id) {
         log.info("Deleting artist with ID: {}", id);
-        repository.findById(id).orElseThrow();
-        repository.deleteById(id);
+        service.deleteArtist(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -94,9 +97,17 @@ public class ArtistController {
             @ApiResponse(responseCode = "404", description = "Artist not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Artists> findById(@PathVariable @Validated UUID id) {
+    public ResponseEntity<Artists> findById(@PathVariable @Validated UUID id, @RequestParam(required = false) String genre) {
         log.info("Finding artist with ID: {}", id);
-        var artist = repository.findById(id);
+        Optional<Artists> artist;
+        artist = repository.findById(id).map(
+                a -> {
+                    if (a.getGenre().equalsIgnoreCase(genre)) return a;
+                    return null;
+                }
+        );
+        if (genre.isEmpty()) artist = repository.findById(id);
+
         return artist.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

@@ -45,7 +45,6 @@ public class SecurityConfig {
         return (HttpServletRequest request) -> {
             String requestPath = request.getRequestURI();
 
-            // Don't extract Bearer token for anonymous endpoints
             if (pathMatcher.match("/auth/**", requestPath) ||
                 pathMatcher.match("/docs/**", requestPath) ||
                 pathMatcher.match("/openapi.json", requestPath) ||

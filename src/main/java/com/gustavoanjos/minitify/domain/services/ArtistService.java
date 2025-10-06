@@ -19,6 +19,15 @@ public class ArtistService {
         this.repository = repository;
     }
 
+    public void deleteArtist(UUID id) {
+        try {
+            repository.findById(id).ifPresent(repository::delete);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new RuntimeException("Failed to delete artist with ID: " + id, e);
+        }
+    }
+
     public void updateArtist(UUID id, ArtistDTO artistDTO) throws IllegalArgumentException {
         if (id == null || artistDTO == null) {
             throw new IllegalArgumentException("ID and ArtistDTO must not be null");
