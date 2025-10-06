@@ -1,10 +1,14 @@
 services:
-  mariadb:
-    image: 'mariadb:latest'
+  postgres:
+    image: 'postgres:15'
     environment:
-      - 'MARIADB_DATABASE=mydatabase'
-      - 'MARIADB_PASSWORD=secret'
-      - 'MARIADB_ROOT_PASSWORD=verysecret'
-      - 'MARIADB_USER=myuser'
+      - 'POSTGRES_DB=minitify'
+      - 'POSTGRES_PASSWORD=minitify'
+      - 'POSTGRES_USER=minitify'
     ports:
-      - 3306:3306
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

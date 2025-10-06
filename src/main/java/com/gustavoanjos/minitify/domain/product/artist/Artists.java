@@ -1,9 +1,6 @@
 package com.gustavoanjos.minitify.domain.product.artist;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,9 +12,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Artist {
+@Table(name = "artists")
+public class Artists {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     public UUID id;
 
     @Setter
@@ -27,5 +25,9 @@ public class Artist {
     @Setter
     public String genre;
 
-    public Artist(String name, String description, String genre) {}
+    public Artists(String name, String description, String genre) {
+        this.name = name;
+        this.description = description;
+        this.genre = genre;
+    }
 }

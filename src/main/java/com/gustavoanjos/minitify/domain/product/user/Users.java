@@ -14,25 +14,29 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
+@Table(name = "app_users")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements UserDetails {
+public class Users implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     public UUID id;
+
     @Setter
     public String name;
     @Setter
     public String email;
     @Setter
     public String password;
+
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     @Enumerated(EnumType.STRING)
     public Set<Roles> roles = new HashSet<>();
 
-    public User(String name, String email, String password) {
+    public Users(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -55,7 +59,24 @@ public class User implements UserDetails {
         return email;
     }
 
-    public boolean isPasswordValid(String password) {
-        return this.password.equals(password);
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
 }

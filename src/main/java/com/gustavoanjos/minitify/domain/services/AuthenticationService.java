@@ -1,6 +1,8 @@
 package com.gustavoanjos.minitify.domain.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -14,15 +16,17 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 @Service
 public class AuthenticationService {
+    
     @Value("${security.jwt.jwk-set-uri:}")
     private String jwkSetUri;
 
     @Value("${security.jwt.shared-secret:}")
     private String sharedSecret;
 
-    // Removed @Bean: return a JwtDecoder instance if configured, otherwise return null
+    @Bean
     public JwtDecoder jwtDecoder() {
         if (jwkSetUri != null && !jwkSetUri.isBlank()) {
             return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
@@ -32,10 +36,12 @@ public class AuthenticationService {
             return NimbusJwtDecoder.withSecretKey(key).build();
         }
         // Return null so the security configuration can decide what to do (useful for dev/test)
+        log.debug("JWT decoder is null - jwkSetUri: {}, sharedSecret: {}", jwkSetUri, (sharedSecret != null ? "present" : "null"));
         return null;
     }
 
 
+    @Bean
     public Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
         authoritiesConverter.setAuthoritiesClaimName("roles");

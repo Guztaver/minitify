@@ -1,12 +1,15 @@
 package com.gustavoanjos.minitify.domain.services;
 
+import com.gustavoanjos.minitify.domain.product.artist.Artists;
 import com.gustavoanjos.minitify.domain.product.artist.ArtistDTO;
 import com.gustavoanjos.minitify.domain.repositories.ArtistRepository;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class ArtistService {
     @Getter
@@ -31,6 +34,18 @@ public class ArtistService {
                     });
         } catch (Exception exception) {
             throw new RuntimeException("Failed to update artist with ID: " + id, exception);
+        }
+    }
+
+    public void createArtist(ArtistDTO artistDTO) {
+        if (artistDTO == null) throw new IllegalArgumentException("ArtistDTO must not be null");
+
+        try {
+            var artist = new Artists(artistDTO.name(), artistDTO.description(), artistDTO.genre());
+            repository.save(artist);
+            log.info("Created artist with ID: {}", artist.getId());
+        } catch (Exception exception) {
+            throw new RuntimeException("Failed to create artist", exception);
         }
     }
 }

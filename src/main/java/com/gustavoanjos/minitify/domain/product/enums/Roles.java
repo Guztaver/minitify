@@ -1,8 +1,8 @@
 package com.gustavoanjos.minitify.domain.product.enums;
 
 public enum Roles {
-    ADMIN("ADMIN"),
-    USER("USER");
+    ADMIN(),
+    USER();
 
-    Roles(String role) {}
+    Roles() {}
 }
