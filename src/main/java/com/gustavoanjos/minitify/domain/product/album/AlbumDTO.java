@@ -18,4 +18,13 @@ public record AlbumDTO(String title, @Validated Artist artist, String genre, @Va
                 this.releaseYear
         );
     }
+
+    public static AlbumDTO fromAlbum(Album album) {
+        return new AlbumDTO(
+                album.getTitle(),
+                album.getArtist(),
+                album.getGenre(),
+                album.getReleaseYear()
+        );
+    }
 }

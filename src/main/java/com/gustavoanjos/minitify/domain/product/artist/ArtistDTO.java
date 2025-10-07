@@ -11,4 +11,12 @@ public record ArtistDTO(String name, String description, String genre) implement
                 this.genre
         );
     }
+
+    public static ArtistDTO fromArtist(Artist artist) {
+        return new ArtistDTO(
+                artist.getName(),
+                artist.getDescription(),
+                artist.getGenre()
+        );
+    }
 }

@@ -1,7 +1,7 @@
 package com.gustavoanjos.minitify.domain.services;
 
 import com.gustavoanjos.minitify.domain.product.album.Album;
-import com.gustavoanjos.minitify.domain.product.album.AlbumCreationDTO;
+import com.gustavoanjos.minitify.domain.product.album.AlbumDTO;
 import com.gustavoanjos.minitify.domain.repositories.AlbumRepository;
 import com.gustavoanjos.minitify.domain.repositories.ArtistRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,8 +19,8 @@ public class AlbumService {
         this.artistRepository = artistRepository;
     }
 
-    public void createAlbum(AlbumCreationDTO data) {
-        var artist = artistRepository.findById(data.artistId())
+    public void createAlbum(AlbumDTO data) {
+        var artist = artistRepository.findById(data.artist().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Artist not found"));
 
         var album = new Album(

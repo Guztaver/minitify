@@ -3,7 +3,6 @@ package com.gustavoanjos.minitify.controllers;
 import com.gustavoanjos.minitify.domain.product.artist.ArtistDTO;
 import com.gustavoanjos.minitify.domain.repositories.ArtistRepository;
 import com.gustavoanjos.minitify.domain.services.ArtistService;
-import com.gustavoanjos.minitify.dto.ArtistResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -40,9 +39,9 @@ public class ArtistController {
             @ApiResponse(responseCode = "403", description = "Access denied - Admin role required")
     })
     @PostMapping
-    public ResponseEntity<ArtistResponseDTO> createArtist(@RequestBody @Validated ArtistDTO artistDTO) {
+    public ResponseEntity<ArtistDTO> createArtist(@RequestBody @Validated ArtistDTO artistDTO) {
         var artist = service.createArtist(artistDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ArtistResponseDTO.fromArtist(artist));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ArtistDTO.fromArtist(artist));
     }
 
     @Operation(summary = "Get all artists", description = "Retrieve all artists")
@@ -50,11 +49,11 @@ public class ArtistController {
             @ApiResponse(responseCode = "200", description = "Artists retrieved successfully")
     })
     @GetMapping("/all")
-    public ResponseEntity<Collection<ArtistResponseDTO>> findAll(@RequestParam(required = false) String genre) {
+    public ResponseEntity<Collection<ArtistDTO>> findAll(@RequestParam(required = false) String genre) {
         var artists =
                 (genre == null || genre.isEmpty() ? repository.findAll() : repository.findByGenre(genre))
                         .stream()
-                        .map(ArtistResponseDTO::fromArtist)
+                        .map(ArtistDTO::fromArtist)
                         .collect(Collectors.toList());
         return ResponseEntity.ok(artists);
     }
@@ -79,13 +78,13 @@ public class ArtistController {
             @ApiResponse(responseCode = "404", description = "Artist not found")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<ArtistResponseDTO> updateArtist(
+    public ResponseEntity<ArtistDTO> updateArtist(
             @RequestBody @Validated ArtistDTO artistDTO,
             @PathVariable @Validated UUID id
     ) {
         log.info("Updating artist with ID: {}", id);
         var updatedArtist = service.updateArtist(id, artistDTO);
-        return ResponseEntity.ok(ArtistResponseDTO.fromArtist(updatedArtist));
+        return ResponseEntity.ok(ArtistDTO.fromArtist(updatedArtist));
     }
 
     @Operation(summary = "Get artist by ID", description = "Retrieve a specific artist by ID")
@@ -94,11 +93,11 @@ public class ArtistController {
             @ApiResponse(responseCode = "404", description = "Artist not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<ArtistResponseDTO> findById(@PathVariable @Validated UUID id) {
+    public ResponseEntity<ArtistDTO> findById(@PathVariable @Validated UUID id) {
         log.info("Finding artist with ID: {}", id);
         var artist = repository.findById(id).orElseThrow(
                 () -> new RuntimeException("Artist not found with ID: " + id)
         );
-        return ResponseEntity.ok(ArtistResponseDTO.fromArtist(artist));
+        return ResponseEntity.ok(ArtistDTO.fromArtist(artist));
     }
 }

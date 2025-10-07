@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.HashSet;
 import java.util.UUID;
 
 @Slf4j
@@ -32,7 +31,6 @@ public class ArtistService {
                     artist.setName(artistDTO.name());
                     artist.setDescription(artistDTO.description());
                     artist.setGenre(artistDTO.genre());
-                    artist.setAlbums(new HashSet<>());
                     return repository.save(artist);
                 }).orElseThrow(
                         () -> new IllegalArgumentException("Artist with ID " + id + " not found")
