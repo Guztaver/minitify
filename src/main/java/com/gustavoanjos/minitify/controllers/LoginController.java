@@ -17,16 +17,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
 @RequestMapping("/auth")
 @Tag(name = "Authentication", description = "Authentication endpoints for user login and registration")
 public class LoginController {
-    public final UserRepository repository;
-    public final TokenService service;
-    public final PasswordEncoder passwordEncoder;
+    private final UserRepository repository;
+    private final TokenService service;
+    private final PasswordEncoder passwordEncoder;
 
     public LoginController(UserRepository repository, TokenService service, PasswordEncoder passwordEncoder) {
         this.repository = repository;

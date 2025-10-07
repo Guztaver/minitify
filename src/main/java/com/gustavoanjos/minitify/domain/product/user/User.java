@@ -12,7 +12,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Entity
@@ -23,6 +26,11 @@ import java.util.stream.Collectors;
 public class User implements UserDetails {
 
     private static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
+
+    // BCrypt hash prefixes for different versions
+    private static final String BCRYPT_PREFIX_2A = "$2a$";
+    private static final String BCRYPT_PREFIX_2B = "$2b$";
+    private static final String BCRYPT_PREFIX_2Y = "$2y$";
 
     @Id
     @GeneratedValue
@@ -52,11 +60,24 @@ public class User implements UserDetails {
             this.password = null;
             return;
         }
-        if (password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$")) {
+        if (isAlreadyBCryptHashed(password)) {
             this.password = password;
         } else {
             this.password = PASSWORD_ENCODER.encode(password);
         }
+    }
+
+    /**
+     * Checks if the given password string is already a BCrypt hash.
+     * BCrypt hashes start with $2a$, $2b$, or $2y$ followed by the cost factor.
+     *
+     * @param password the password string to check
+     * @return true if the password is already BCrypt hashed, false otherwise
+     */
+    private boolean isAlreadyBCryptHashed(String password) {
+        return password.startsWith(BCRYPT_PREFIX_2A) ||
+                password.startsWith(BCRYPT_PREFIX_2B) ||
+                password.startsWith(BCRYPT_PREFIX_2Y);
     }
 
     @Override
