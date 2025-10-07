@@ -2,7 +2,7 @@ package com.gustavoanjos.minitify.controllers;
 
 import com.gustavoanjos.minitify.domain.product.enums.Roles;
 import com.gustavoanjos.minitify.domain.product.user.LoginDTO;
-import com.gustavoanjos.minitify.domain.product.user.Users;
+import com.gustavoanjos.minitify.domain.product.user.User;
 import com.gustavoanjos.minitify.domain.product.user.UserDTO;
 import com.gustavoanjos.minitify.domain.repositories.UserRepository;
 import com.gustavoanjos.minitify.domain.services.TokenService;
@@ -33,7 +33,7 @@ public class LoginController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Operation(summary = "User login", description = "Authenticate user and return JWT token")
+    @Operation(summary = "User login", description = "Authenticate user and return JWT token", security = {})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login successful"),
             @ApiResponse(responseCode = "400", description = "Invalid credentials"),
@@ -43,28 +43,21 @@ public class LoginController {
     public ResponseEntity<?> login(@RequestBody @Validated LoginDTO data) {
         log.debug("Attempting login for email: {}", data.email());
         
-        // Validate input
-        if (data.email() == null || data.email().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Email is required");
-        }
-        if (data.password() == null || data.password().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Password is required");
-        }
-        
-        var user = repository.findByEmail(data.email());
-        if (user == null) {
-            return ResponseEntity.badRequest().body("Invalid email or password");
-        }
-        if (!passwordEncoder.matches(data.password(), user.getPassword())) {
-            return ResponseEntity.badRequest().body("Invalid email or password");
-        }
+        if (data.email().isEmpty()) return ResponseEntity.badRequest().body("Email is required");
+        if (data.password().isEmpty()) return ResponseEntity.badRequest().body("Password is required");
+
+        var user = repository.findByEmail(data.email()).orElseThrow(
+                () -> new IllegalIdentifierException("Email not found")
+        );
+
+        if (!passwordEncoder.matches(data.password(), user.getPassword())) return ResponseEntity.badRequest().body("Invalid email or password");
 
         var token = service.generateToken(user.getUsername(), user.getRoles());
         log.debug("Generated token: {}...", String.valueOf(token).substring(0, 10));
         return ResponseEntity.ok(token);
     }
 
-    @Operation(summary = "User registration", description = "Register a new user account")
+    @Operation(summary = "User registration", description = "Register a new user account", security = {})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User registered successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid user data"),
@@ -74,24 +67,14 @@ public class LoginController {
     public ResponseEntity<?> register(@RequestBody @Validated UserDTO data) {
         log.debug("Attempting register for email: {}", data.email());
         
-        // Validate input
-        if (data.name() == null || data.name().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Name is required");
-        }
-        if (data.email() == null || data.email().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Email is required");
-        }
-        if (data.password() == null || data.password().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Password is required");
-        }
-        
-        // Check if user already exists
-        if (repository.findByEmail(data.email()) != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User with this email already exists");
-        }
-        
-        var user = new Users(data.name(), data.email(), passwordEncoder.encode(data.password()));
-        user.roles.add(Roles.USER);
+        if (data.name().isEmpty()) return ResponseEntity.badRequest().body("Name is required");
+        if (data.email().isEmpty()) return ResponseEntity.badRequest().body("Email is required");
+        if (data.password().isEmpty()) return ResponseEntity.badRequest().body("Password is required");
+
+        if (repository.findByEmail(data.email()).isPresent()) return ResponseEntity.status(HttpStatus.CONFLICT).body("User with this email already exists");
+
+        var user = new User(data.name(), data.email(), passwordEncoder.encode(data.password()));
+        user.getRoles().add(Roles.USER);
         repository.save(user);
         log.debug("User {} registered successfully", data.email());
         return ResponseEntity.status(HttpStatus.CREATED).build();

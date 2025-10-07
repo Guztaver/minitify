@@ -18,25 +18,25 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Users implements UserDetails {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue
-    public UUID id;
+    private UUID id;
 
     @Setter
-    public String name;
+    private String name;
     @Setter
-    public String email;
+    private String email;
     @Setter
-    public String password;
+    private String password;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     @Enumerated(EnumType.STRING)
-    public Set<Roles> roles = new HashSet<>();
+    private Set<Roles> roles = new HashSet<>();
 
-    public Users(String name, String email, String password) {
+    public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;

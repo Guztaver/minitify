@@ -1,13 +1,13 @@
 package com.gustavoanjos.minitify.domain.repositories;
 
-import com.gustavoanjos.minitify.domain.product.artist.Artists;
+import com.gustavoanjos.minitify.domain.product.artist.Artist;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;
 import java.util.UUID;
 
-public interface ArtistRepository extends JpaRepository<Artists, UUID> {
-    Collection<Artists> findByName(String name);
-    Collection<Artists> findByGenre(String genre);
-    Collection<Artists> findByDescription(String description);
+public interface ArtistRepository extends JpaRepository<Artist, UUID> {
+    Collection<Artist> findByName(String name);
+    Collection<Artist> findByGenre(String genre);
+    Collection<Artist> findByDescription(String description);
 }

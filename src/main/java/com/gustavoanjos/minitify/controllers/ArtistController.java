@@ -1,9 +1,9 @@
 package com.gustavoanjos.minitify.controllers;
 
-import com.gustavoanjos.minitify.domain.product.artist.Artists;
 import com.gustavoanjos.minitify.domain.product.artist.ArtistDTO;
 import com.gustavoanjos.minitify.domain.repositories.ArtistRepository;
 import com.gustavoanjos.minitify.domain.services.ArtistService;
+import com.gustavoanjos.minitify.dto.ArtistResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -16,8 +16,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -36,14 +36,13 @@ public class ArtistController {
 
     @Operation(summary = "Create artist", description = "Create a new artist (Admin only)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Artist created successfully"),
+            @ApiResponse(responseCode = "201", description = "Artist created successfully"),
             @ApiResponse(responseCode = "403", description = "Access denied - Admin role required")
     })
     @PostMapping
-    public ResponseEntity<HttpStatus> createArtist(@RequestBody @Validated ArtistDTO artistDTO) {
-        service.createArtist(artistDTO);
-
-        return ResponseEntity.ok(HttpStatus.CREATED);
+    public ResponseEntity<ArtistResponseDTO> createArtist(@RequestBody @Validated ArtistDTO artistDTO) {
+        var artist = service.createArtist(artistDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ArtistResponseDTO.fromArtist(artist));
     }
 
     @Operation(summary = "Get all artists", description = "Retrieve all artists")
@@ -51,10 +50,13 @@ public class ArtistController {
             @ApiResponse(responseCode = "200", description = "Artists retrieved successfully")
     })
     @GetMapping("/all")
-    public Collection<Artists> findAll(@RequestParam(required = false) String genre) {
-        log.info("Finding all artists");
-        if (genre.isEmpty()) return repository.findAll();
-        return repository.findByGenre(genre);
+    public ResponseEntity<Collection<ArtistResponseDTO>> findAll(@RequestParam(required = false) String genre) {
+        var artists =
+                (genre == null || genre.isEmpty() ? repository.findAll() : repository.findByGenre(genre))
+                        .stream()
+                        .map(ArtistResponseDTO::fromArtist)
+                        .collect(Collectors.toList());
+        return ResponseEntity.ok(artists);
     }
 
     @Operation(summary = "Delete artist", description = "Delete an artist by ID")
@@ -77,18 +79,13 @@ public class ArtistController {
             @ApiResponse(responseCode = "404", description = "Artist not found")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<HttpStatus> updateArtist(
+    public ResponseEntity<ArtistResponseDTO> updateArtist(
             @RequestBody @Validated ArtistDTO artistDTO,
             @PathVariable @Validated UUID id
     ) {
         log.info("Updating artist with ID: {}", id);
-        var artist = repository.findById(id);
-        if (artist.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        service.updateArtist(id, artistDTO);
-
-        return ResponseEntity.ok(HttpStatus.OK);
+        var updatedArtist = service.updateArtist(id, artistDTO);
+        return ResponseEntity.ok(ArtistResponseDTO.fromArtist(updatedArtist));
     }
 
     @Operation(summary = "Get artist by ID", description = "Retrieve a specific artist by ID")
@@ -97,17 +94,11 @@ public class ArtistController {
             @ApiResponse(responseCode = "404", description = "Artist not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Artists> findById(@PathVariable @Validated UUID id, @RequestParam(required = false) String genre) {
+    public ResponseEntity<ArtistResponseDTO> findById(@PathVariable @Validated UUID id) {
         log.info("Finding artist with ID: {}", id);
-        Optional<Artists> artist;
-        artist = repository.findById(id).map(
-                a -> {
-                    if (a.getGenre().equalsIgnoreCase(genre)) return a;
-                    return null;
-                }
+        var artist = repository.findById(id).orElseThrow(
+                () -> new RuntimeException("Artist not found with ID: " + id)
         );
-        if (genre.isEmpty()) artist = repository.findById(id);
-
-        return artist.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok(ArtistResponseDTO.fromArtist(artist));
     }
 }
