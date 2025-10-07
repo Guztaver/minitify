@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j

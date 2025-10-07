@@ -9,6 +9,8 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class User implements UserDetails {
 
+    private static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
+
     @Id
     @GeneratedValue
     private UUID id;
@@ -28,18 +32,31 @@ public class User implements UserDetails {
     private String name;
     @Setter
     private String email;
-    @Setter
+
+    @Column(nullable = false)
     private String password;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     @Enumerated(EnumType.STRING)
-    private Set<Roles> roles = new HashSet<>();
+    private final Set<Roles> roles = new HashSet<>();
 
     public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
-        this.password = password;
+        setPassword(password);
+    }
+
+    public void setPassword(String password) {
+        if (password == null) {
+            this.password = null;
+            return;
+        }
+        if (password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$")) {
+            this.password = password;
+        } else {
+            this.password = PASSWORD_ENCODER.encode(password);
+        }
     }
 
     @Override

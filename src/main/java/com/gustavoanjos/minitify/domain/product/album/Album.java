@@ -37,8 +37,4 @@ public class Album {
         this.genre = genre;
         this.releaseYear = releaseYear;
     }
-
-    public String getArtistName() {
-        return artist.getName();
-    }
 }

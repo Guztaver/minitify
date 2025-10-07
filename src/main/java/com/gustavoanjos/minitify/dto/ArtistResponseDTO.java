@@ -1,5 +1,6 @@
 package com.gustavoanjos.minitify.dto;
 
+import com.gustavoanjos.minitify.domain.product.album.Album;
 import com.gustavoanjos.minitify.domain.product.artist.Artist;
 
 import java.util.Set;
@@ -13,7 +14,7 @@ public record ArtistResponseDTO(UUID id, String name, String description, String
                 artist.getName(),
                 artist.getDescription(),
                 artist.getGenre(),
-                artist.getAlbums().stream().map(album -> album.getId()).collect(Collectors.toSet())
+                artist.getAlbums().stream().map(Album::getId).collect(Collectors.toSet())
         );
     }
 }

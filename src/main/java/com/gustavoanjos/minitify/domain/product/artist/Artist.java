@@ -33,18 +33,6 @@ public class Artist {
     @JsonManagedReference
     private Set<Album> albums = new HashSet<>();
 
-    public boolean hasGenre(String genre) {
-        return this.genre.equalsIgnoreCase(genre);
-    }
-
-    public void addAlbum(Album album) {
-        this.albums.add(album);
-    }
-
-    public void removeAlbum(Album album) {
-        this.albums.remove(album);
-    }
-
     public Artist(String name, String description, String genre) {
         this.name = name;
         this.description = description;

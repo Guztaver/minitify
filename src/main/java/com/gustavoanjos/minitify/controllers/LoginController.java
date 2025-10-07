@@ -9,6 +9,7 @@ import com.gustavoanjos.minitify.domain.services.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.boot.model.naming.IllegalIdentifierException;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 @Tag(name = "Authentication", description = "Authentication endpoints for user login and registration")
 public class LoginController {
-    public UserRepository repository;
+    public final UserRepository repository;
     public final TokenService service;
     public final PasswordEncoder passwordEncoder;
 
@@ -33,7 +34,9 @@ public class LoginController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Operation(summary = "User login", description = "Authenticate user and return JWT token", security = {})
+    @Operation(summary = "User login", description = "Authenticate user and return JWT token", security = {
+            @SecurityRequirement(name = "none")
+    })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login successful"),
             @ApiResponse(responseCode = "400", description = "Invalid credentials"),
@@ -57,7 +60,9 @@ public class LoginController {
         return ResponseEntity.ok(token);
     }
 
-    @Operation(summary = "User registration", description = "Register a new user account", security = {})
+    @Operation(summary = "User registration", description = "Register a new user account", security = {
+            @SecurityRequirement(name = "none")
+    })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User registered successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid user data"),

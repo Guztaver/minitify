@@ -7,7 +7,5 @@ import java.util.Collection;
 import java.util.UUID;
 
 public interface ArtistRepository extends JpaRepository<Artist, UUID> {
-    Collection<Artist> findByName(String name);
     Collection<Artist> findByGenre(String genre);
-    Collection<Artist> findByDescription(String description);
 }
