@@ -108,6 +108,7 @@ public class ArtistController {
             @ApiResponse(responseCode = "200", description = "Albums retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "Artist not found")
     })
+    @GetMapping("/{id}/albums")
     public ResponseEntity<Set<Album>> getArtistAlbums(@PathVariable @Validated UUID id, AlbumService albumService) {
         var artist = repository.findById(id).orElseThrow(
                 () -> new RuntimeException("Artist not found with ID: " + id)

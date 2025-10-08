@@ -2,6 +2,7 @@ package com.gustavoanjos.minitify.domain.product.user;
 
 import com.gustavoanjos.minitify.domain.product.enums.Roles;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,11 +38,14 @@ public class User implements UserDetails {
     private UUID id;
 
     @Setter
+    @NotNull
     private String name;
     @Setter
+    @NotNull
     private String email;
 
     @Column(nullable = false)
+    @NotNull
     private String password;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -96,25 +100,4 @@ public class User implements UserDetails {
     public String getUsername() {
         return email;
     }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-
 }
