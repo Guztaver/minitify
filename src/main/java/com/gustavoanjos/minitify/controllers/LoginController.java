@@ -9,7 +9,6 @@ import com.gustavoanjos.minitify.domain.services.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.boot.model.naming.IllegalIdentifierException;
@@ -37,9 +36,7 @@ public class LoginController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Operation(summary = "User login", description = "Authenticate user and return JWT token", security = {
-            @SecurityRequirement(name = "none")
-    })
+    @Operation(summary = "User login", description = "Authenticate user and return JWT token")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login successful"),
             @ApiResponse(responseCode = "404", description = "Email not found"),
@@ -63,9 +60,7 @@ public class LoginController {
         return ResponseEntity.ok(token);
     }
 
-    @Operation(summary = "User registration", description = "Register a new user account", security = {
-            @SecurityRequirement(name = "none")
-    })
+    @Operation(summary = "User registration", description = "Register a new user account")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User registered successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid user data"),

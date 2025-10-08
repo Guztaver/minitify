@@ -1,7 +1,9 @@
 package com.gustavoanjos.minitify.controllers;
 
+import com.gustavoanjos.minitify.domain.product.album.Album;
 import com.gustavoanjos.minitify.domain.product.artist.ArtistDTO;
 import com.gustavoanjos.minitify.domain.repositories.ArtistRepository;
+import com.gustavoanjos.minitify.domain.services.AlbumService;
 import com.gustavoanjos.minitify.domain.services.ArtistService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -98,5 +101,18 @@ public class ArtistController {
                 () -> new RuntimeException("Artist not found with ID: " + id)
         );
         return ResponseEntity.ok(ArtistDTO.fromArtist(artist));
+    }
+
+    @Operation(summary = "Get artist albums", description = "Retrieve albums of a specific artist by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Albums retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Artist not found")
+    })
+    public ResponseEntity<Set<Album>> getArtistAlbums(@PathVariable @Validated UUID id, AlbumService albumService) {
+        var artist = repository.findById(id).orElseThrow(
+                () -> new RuntimeException("Artist not found with ID: " + id)
+        );
+        var albums = albumService.getRepository().findByArtist(artist);
+        return ResponseEntity.ok(albums);
     }
 }
