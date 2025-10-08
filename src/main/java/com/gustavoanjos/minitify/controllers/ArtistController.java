@@ -62,8 +62,7 @@ public class ArtistController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Artist deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Artist not found"),
-            @ApiResponse(responseCode = "403", description = "Access denied - Admin role required"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "403", description = "Access denied - Admin role required")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteArtist(@PathVariable @Validated UUID id) {

@@ -8,6 +8,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class AlbumService {
     @Getter
@@ -19,8 +21,8 @@ public class AlbumService {
         this.artistRepository = artistRepository;
     }
 
-    public void createAlbum(AlbumDTO data) {
-        var artist = artistRepository.findById(data.artist().getId())
+    public void createAlbum(AlbumDTO.WithArtistId data) {
+        var artist = artistRepository.findById(data.artistId())
                 .orElseThrow(() -> new EntityNotFoundException("Artist not found"));
 
         var album = new Album(
@@ -30,5 +32,20 @@ public class AlbumService {
                 data.releaseYear()
         );
         repository.save(album);
+    }
+
+    public void delete(UUID id) {
+        repository.findById(id).ifPresent(repository::delete);
+    }
+
+    public void update(UUID existingAlbumId, AlbumDTO.WithArtistId data) {
+        repository.save(repository.findById(existingAlbumId).map(
+                a -> {
+                    a.setTitle(data.title());
+                    a.setGenre(data.genre());
+                    a.setReleaseYear(data.releaseYear());
+                    return repository.save(a);
+                }
+        ).orElseThrow(() -> new EntityNotFoundException("Album not found")));
     }
 }

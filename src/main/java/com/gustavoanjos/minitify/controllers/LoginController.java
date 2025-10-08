@@ -42,8 +42,8 @@ public class LoginController {
     })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login successful"),
-            @ApiResponse(responseCode = "400", description = "Invalid credentials"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data")
+            @ApiResponse(responseCode = "404", description = "Email not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid credentials or request data")
     })
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Validated LoginDTO data) {

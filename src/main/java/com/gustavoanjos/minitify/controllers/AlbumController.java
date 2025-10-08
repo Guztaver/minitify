@@ -20,12 +20,12 @@ import java.util.stream.Collectors;
 @Tag(description = "Endpoints for managing albums", name = "Album Controller")
 public class AlbumController {
 
-    private final AlbumService albumService;
+    private final AlbumService service;
     private final AlbumRepository repository;
 
-    public AlbumController(AlbumService albumService) {
-        this.albumService = albumService;
-        this.repository = albumService.getRepository();
+    public AlbumController(AlbumService service) {
+        this.service = service;
+        this.repository = service.getRepository();
     }
 
     @PostMapping
@@ -33,8 +33,8 @@ public class AlbumController {
             @ApiResponse(responseCode = "201", description =  "Album created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid album data provided")
     })
-    public ResponseEntity<HttpStatus> createAlbum(@Validated @RequestBody AlbumDTO data) {
-        albumService.createAlbum(data);
+    public ResponseEntity<HttpStatus> createAlbum(@Validated @RequestBody AlbumDTO.WithArtistId data) {
+        service.createAlbum(data);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -42,7 +42,7 @@ public class AlbumController {
     @GetMapping
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description =  "Albums retrieved successfully"),
-            @ApiResponse(responseCode = "204", description = "No albums found")
+            @ApiResponse(responseCode = "404", description = "No albums found")
     })
     public ResponseEntity<List<AlbumDTO>> getAllAlbums() {
         var albums = repository.findAll()
@@ -50,15 +50,46 @@ public class AlbumController {
                 .map(AlbumDTO::fromAlbum)
                 .collect(Collectors.toList());
 
+        if (albums.isEmpty()) return ResponseEntity.notFound().build();
+
         return ResponseEntity.ok(albums);
     }
 
     @GetMapping("/{id}")
-    @ApiResponses({})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Album retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Album not found")
+    })
     public ResponseEntity<AlbumDTO> getAlbumById(@PathVariable UUID id) {
         var album = repository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("Album with id " + id + " not found")
         );
+
+        return ResponseEntity.ok(AlbumDTO.fromAlbum(album));
+    }
+
+    @DeleteMapping("/{id}")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Album not found")
+    })
+    public ResponseEntity<HttpStatus> deleteAlbumById(@PathVariable UUID id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Album updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid album data provided"),
+            @ApiResponse(responseCode = "404", description = "Album not found")
+    })
+    public ResponseEntity<AlbumDTO> updateAlbum(@PathVariable UUID id, @Validated @RequestBody AlbumDTO.WithArtistId data) {
+        var album = repository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("Album with id " + id + " not found")
+        );
+
+        service.update(album.getId(), data);
 
         return ResponseEntity.ok(AlbumDTO.fromAlbum(album));
     }

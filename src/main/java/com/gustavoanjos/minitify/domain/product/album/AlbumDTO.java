@@ -5,6 +5,7 @@ import com.gustavoanjos.minitify.domain.product.artist.Artist;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Date;
+import java.util.UUID;
 
 public record AlbumDTO(String title, @Validated Artist artist, String genre, @Validated Date releaseYear) implements DTO<Album> {
 
@@ -26,5 +27,8 @@ public record AlbumDTO(String title, @Validated Artist artist, String genre, @Va
                 album.getGenre(),
                 album.getReleaseYear()
         );
+    }
+
+    public record WithArtistId(String title, UUID artistId, String genre, @Validated Date releaseYear) {
     }
 }
