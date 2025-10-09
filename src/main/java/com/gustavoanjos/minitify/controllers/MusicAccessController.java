@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping
-@Tag(name = "Trendings", description = "Endpoints for music access statistics and trending")
+@Tag(name = "Trending", description = "Endpoints for music access statistics and trending")
 @SecurityRequirement(name = "bearerAuth")
 public class MusicAccessController {
 
