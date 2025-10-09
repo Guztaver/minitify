@@ -14,8 +14,9 @@ public record PlaylistDTO(
         @NotBlank String name,
         String description,
         boolean isPublic
-) implements DTO {
+) implements DTO<Playlist> {
 
+    @SuppressWarnings("unused")
     public static PlaylistDTO fromPlaylist(Playlist playlist) {
         return new PlaylistDTO(
                 playlist.getName(),

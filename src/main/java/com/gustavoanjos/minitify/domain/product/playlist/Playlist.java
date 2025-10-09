@@ -19,6 +19,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings({"JpaDataSourceORMInspection"})
 public class Playlist {
 
     @Id

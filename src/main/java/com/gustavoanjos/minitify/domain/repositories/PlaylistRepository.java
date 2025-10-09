@@ -22,14 +22,15 @@ public interface PlaylistRepository extends JpaRepository<Playlist, UUID> {
 
     Optional<Playlist> findByIdAndOwner(UUID id, User owner);
 
+    @SuppressWarnings("unused")
     Optional<Playlist> findByIdAndOwnerId(UUID id, UUID ownerId);
 
     @Query("SELECT p FROM Playlist p WHERE p.isPublic = true OR p.owner.id = :userId")
     List<Playlist> findAllAccessibleByUser(@Param("userId") UUID userId);
 
+    @SuppressWarnings("unused")
     @Query("SELECT p FROM Playlist p JOIN p.musics m WHERE m.id = :musicId AND (p.isPublic = true OR p.owner.id = :userId)")
     List<Playlist> findByMusicIdAndAccessibleByUser(@Param("musicId") UUID musicId, @Param("userId") UUID userId);
 
     long countByOwnerId(UUID ownerId);
 }
-

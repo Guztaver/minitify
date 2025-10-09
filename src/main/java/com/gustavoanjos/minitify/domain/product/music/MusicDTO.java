@@ -6,7 +6,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.UUID;
 
-public record MusicDTO(String title, @Validated Album album, int duration) implements DTO {
+public record MusicDTO(String title, @Validated Album album, int duration) implements DTO<Music> {
     @Override
     public Music toEntity() {
         return new Music(

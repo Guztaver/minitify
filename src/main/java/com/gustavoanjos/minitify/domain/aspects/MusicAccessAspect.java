@@ -61,20 +61,14 @@ public class MusicAccessAspect {
 
     private Optional<Music> resolveMusicFromReturn(Object retVal) {
         return Optional.ofNullable(retVal)
-                .flatMap(val -> {
-                    if (val instanceof Music music) {
-                        return Optional.of(music);
-                    }
-                    if (val instanceof ResponseEntity<?> response) {
-                        return Optional.ofNullable(response.getBody())
-                                .filter(body -> body instanceof Music)
-                                .map(body -> (Music) body);
-                    }
-                    if (val instanceof Optional<?> opt) {
-                        return opt.filter(o -> o instanceof Music)
-                                .map(o -> (Music) o);
-                    }
-                    return Optional.empty();
+                .flatMap(val -> switch (val) {
+                    case Music music -> Optional.of(music);
+                    case ResponseEntity<?> response -> Optional.ofNullable(response.getBody())
+                            .filter(body -> body instanceof Music)
+                            .map(body -> (Music) body);
+                    case Optional<?> opt -> opt.filter(o -> o instanceof Music)
+                            .map(o -> (Music) o);
+                    default -> Optional.empty();
                 });
     }
 

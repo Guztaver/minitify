@@ -19,6 +19,7 @@ public class PlaylistService {
     @Getter
     private final PlaylistRepository repository;
     private final MusicService musicService;
+    @SuppressWarnings("FieldCanBeLocal")
     private final UserService userService;
 
     public PlaylistService(PlaylistRepository repository, MusicService musicService, UserService userService) {
@@ -124,9 +125,9 @@ public class PlaylistService {
                 .orElse(false);
     }
 
+    @SuppressWarnings("unused")
     @Transactional(readOnly = true)
     public long countPlaylistsByUser(UUID userId) {
         return repository.countByOwnerId(userId);
     }
 }
-
