@@ -1,7 +1,10 @@
 package com.gustavoanjos.minitify.domain.services;
 
 import com.gustavoanjos.minitify.domain.product.enums.Roles;
-import com.nimbusds.jose.*;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -26,11 +30,12 @@ public class TokenService {
     private long expirationMs;
 
     public String generateToken(String username, Set<Roles> roles) {
-        if (sharedSecret == null || sharedSecret.isBlank()) {
-            throw new IllegalStateException("Nenhuma chave compartilhada configurada em security.jwt.shared-secret");
-        }
+        String validatedSecret = Optional.ofNullable(sharedSecret)
+                .filter(s -> !s.isBlank())
+                .orElseThrow(() -> new IllegalStateException("Nenhuma chave compartilhada configurada em security.jwt.shared-secret"));
+
         try {
-            JWSSigner signer = new MACSigner(sharedSecret.getBytes(StandardCharsets.UTF_8));
+            JWSSigner signer = new MACSigner(validatedSecret.getBytes(StandardCharsets.UTF_8));
 
             Date now = new Date();
             Date exp = new Date(now.getTime() + expirationMs);
@@ -41,9 +46,9 @@ public class TokenService {
                     .issueTime(now)
                     .expirationTime(exp);
 
-            if (roles != null && !roles.isEmpty()) {
-                claims.claim("roles", roles);
-            }
+            Optional.ofNullable(roles)
+                    .filter(r -> !r.isEmpty())
+                    .ifPresent(r -> claims.claim("roles", r));
 
             SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claims.build());
             signedJWT.sign(signer);

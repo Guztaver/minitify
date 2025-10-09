@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -53,11 +54,13 @@ public class ArtistController {
     })
     @GetMapping("/all")
     public ResponseEntity<Collection<ArtistDTO>> findAll(@RequestParam(required = false) String genre) {
-        var artists =
-                (genre == null || genre.isEmpty() ? repository.findAll() : repository.findByGenre(genre))
-                        .stream()
-                        .map(ArtistDTO::fromArtist)
-                        .collect(Collectors.toList());
+        var artists = Optional.ofNullable(genre)
+                .filter(g -> !g.isEmpty())
+                .map(repository::findByGenre)
+                .orElseGet(repository::findAll)
+                .stream()
+                .map(ArtistDTO::fromArtist)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(artists);
     }
 

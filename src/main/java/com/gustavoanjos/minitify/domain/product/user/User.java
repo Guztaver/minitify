@@ -13,10 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
@@ -60,15 +57,9 @@ public class User implements UserDetails {
     }
 
     public void setPassword(String password) {
-        if (password == null) {
-            this.password = null;
-            return;
-        }
-        if (isAlreadyBCryptHashed(password)) {
-            this.password = password;
-        } else {
-            this.password = PASSWORD_ENCODER.encode(password);
-        }
+        this.password = Optional.ofNullable(password)
+                .map(pwd -> isAlreadyBCryptHashed(pwd) ? pwd : PASSWORD_ENCODER.encode(pwd))
+                .orElse(null);
     }
 
     /**

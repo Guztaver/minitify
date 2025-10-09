@@ -1,5 +1,6 @@
 package com.gustavoanjos.minitify.controllers;
 
+import com.gustavoanjos.minitify.domain.product.musicAccess.TrendingMusicDTO;
 import com.gustavoanjos.minitify.domain.services.MusicAccessService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -31,7 +33,7 @@ public class MusicAccessController {
             @ApiResponse(responseCode = "200", description = "Count returned"),
             @ApiResponse(responseCode = "404", description = "Music not found")
     })
-    public ResponseEntity<Map<String, Object>> countForMusic(@PathVariable UUID id) {
+    public ResponseEntity<Map<String, Serializable>> countForMusic(@PathVariable UUID id) {
         long count = musicAccessService.countForMusic(id);
         return ResponseEntity.ok(Map.of("musicId", id, "count", count));
     }
@@ -41,9 +43,8 @@ public class MusicAccessController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Trending returned")
     })
-    public ResponseEntity<List<Map<String, Object>>> trending(@RequestParam(defaultValue = "10") int limit) {
+    public ResponseEntity<List<TrendingMusicDTO>> trending(@RequestParam(defaultValue = "10") int limit) {
         var list = musicAccessService.trending(limit);
         return ResponseEntity.ok(list);
     }
 }
-

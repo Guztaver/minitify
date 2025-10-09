@@ -40,7 +40,7 @@ public class MusicController {
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<HttpStatus> createMusic(@Validated @RequestBody MusicDTO.WithAlbumId data, UUID albumId) {
+    public ResponseEntity<HttpStatus> createMusic(@Validated @RequestBody MusicDTO.WithAlbumId data) {
         log.info("Creating music: {}", data);
         musicService.createMusic(data);
         return ResponseEntity.ok().build();

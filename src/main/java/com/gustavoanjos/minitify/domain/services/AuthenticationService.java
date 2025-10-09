@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -28,16 +29,21 @@ public class AuthenticationService {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        if (jwkSetUri != null && !jwkSetUri.isBlank()) {
-            return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
-        }
-        if (sharedSecret != null && !sharedSecret.isBlank()) {
-            SecretKey key = new SecretKeySpec(sharedSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
-            return NimbusJwtDecoder.withSecretKey(key).build();
-        }
-        // Return null so the security configuration can decide what to do (useful for dev/test)
-        log.debug("JWT decoder is null - jwkSetUri: {}, sharedSecret: {}", jwkSetUri, (sharedSecret != null ? "present" : "null"));
-        return null;
+        return Optional.ofNullable(jwkSetUri)
+                .filter(uri -> !uri.isBlank())
+                .map(uri -> (JwtDecoder) NimbusJwtDecoder.withJwkSetUri(uri).build())
+                .orElseGet(() -> Optional.ofNullable(sharedSecret)
+                        .filter(secret -> !secret.isBlank())
+                        .map(secret -> {
+                            SecretKey key = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+                            return (JwtDecoder) NimbusJwtDecoder.withSecretKey(key).build();
+                        })
+                        .orElseGet(() -> {
+                            log.debug("JWT decoder is null - jwkSetUri: {}, sharedSecret: {}",
+                                    jwkSetUri,
+                                    Optional.ofNullable(sharedSecret).map(s -> "present").orElse("null"));
+                            return null;
+                        }));
     }
 
 

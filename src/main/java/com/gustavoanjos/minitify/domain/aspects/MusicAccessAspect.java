@@ -1,7 +1,6 @@
 package com.gustavoanjos.minitify.domain.aspects;
 
 import com.gustavoanjos.minitify.domain.product.music.Music;
-import com.gustavoanjos.minitify.domain.product.user.User;
 import com.gustavoanjos.minitify.domain.services.MusicAccessService;
 import com.gustavoanjos.minitify.domain.services.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,70 +36,70 @@ public class MusicAccessAspect {
     @AfterReturning(pointcut = "@annotation(com.gustavoanjos.minitify.domain.aspects.TrackMusicAccess)", returning = "retVal")
     public void afterTrackedMethod(JoinPoint jp, Object retVal) {
         try {
-            // resolve music from return value first
-            Music music = resolveMusicFromReturn(retVal);
+            Optional<Music> musicOpt = resolveMusicFromReturn(retVal)
+                    .or(() -> resolveMusicFromArgs(jp.getArgs()));
 
-            // if not found in return, try to find UUID in method args
-            if (music == null) {
-                music = resolveMusicFromArgs(jp.getArgs());
-            }
-
-            if (music == null) {
-                log.debug("MusicAccessAspect: no music resolved from method {}", jp.getSignature());
-                return;
-            }
-
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth == null || !auth.isAuthenticated()) {
-                log.debug("MusicAccessAspect: no authenticated user");
-                return;
-            }
-
-            String username = auth.getName();
-            Optional<User> userOpt = userService.getRepository().findByEmail(username);
-            if (userOpt.isEmpty()) {
-                log.debug("MusicAccessAspect: authenticated principal {} not found as User", username);
-                return;
-            }
-
-            musicAccessService.recordAccess(userOpt.get(), music);
-
+            musicOpt.ifPresentOrElse(
+                    this::recordAccessForAuthenticatedUser,
+                    () -> log.debug("MusicAccessAspect: no music resolved from method {}", jp.getSignature())
+            );
         } catch (Exception e) {
             log.error("Error in MusicAccessAspect while recording access", e);
         }
     }
 
-    private Music resolveMusicFromReturn(Object retVal) {
-        if (retVal == null) return null;
-        if (retVal instanceof Music) return (Music) retVal;
-        if (retVal instanceof ResponseEntity) {
-            Object body = ((ResponseEntity<?>) retVal).getBody();
-            if (body instanceof Music) return (Music) body;
-        }
-        if (retVal instanceof Optional<?> o) {
-            if (o.isPresent() && o.get() instanceof Music) return (Music) o.get();
-        }
-        return null;
+    private void recordAccessForAuthenticatedUser(Music music) {
+        Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .filter(Authentication::isAuthenticated)
+                .map(Authentication::getName)
+                .flatMap(username -> userService.getRepository().findByEmail(username))
+                .ifPresentOrElse(
+                        user -> musicAccessService.recordAccess(user, music),
+                        () -> log.debug("MusicAccessAspect: authenticated principal not found as User")
+                );
     }
 
-    private Music resolveMusicFromArgs(Object[] args) {
-        if (args == null) return null;
-        // try to find UUID or Music in args
-        for (Object a : args) {
-            if (a == null) continue;
-            if (a instanceof UUID id) {
-                return musicAccessService.getMusicService().getRepository().findById(id).orElse(null);
-            }
-            if (a instanceof String) {
-                // maybe UUID as string
-                try {
-                    UUID id = UUID.fromString((String) a);
-                    return musicAccessService.getMusicService().getRepository().findById(id).orElse(null);
-                } catch (IllegalArgumentException ignored) {
-                }
-            }
-            if (a instanceof Music) return (Music) a;
-        }
-        return null;
+    private Optional<Music> resolveMusicFromReturn(Object retVal) {
+        return Optional.ofNullable(retVal)
+                .flatMap(val -> {
+                    if (val instanceof Music music) {
+                        return Optional.of(music);
+                    }
+                    if (val instanceof ResponseEntity<?> response) {
+                        return Optional.ofNullable(response.getBody())
+                                .filter(body -> body instanceof Music)
+                                .map(body -> (Music) body);
+                    }
+                    if (val instanceof Optional<?> opt) {
+                        return opt.filter(o -> o instanceof Music)
+                                .map(o -> (Music) o);
+                    }
+                    return Optional.empty();
+                });
+    }
+
+    private Optional<Music> resolveMusicFromArgs(Object[] args) {
+        return Optional.ofNullable(args)
+                .stream()
+                .flatMap(Arrays::stream)
+                .filter(Objects::nonNull)
+                .flatMap(arg -> {
+                    if (arg instanceof Music music) {
+                        return Optional.of(music).stream();
+                    }
+                    if (arg instanceof UUID id) {
+                        return musicAccessService.getMusicService().getRepository().findById(id).stream();
+                    }
+                    if (arg instanceof String str) {
+                        try {
+                            UUID id = UUID.fromString(str);
+                            return musicAccessService.getMusicService().getRepository().findById(id).stream();
+                        } catch (IllegalArgumentException ignored) {
+                            return Optional.<Music>empty().stream();
+                        }
+                    }
+                    return Optional.<Music>empty().stream();
+                })
+                .findFirst();
     }
 }
