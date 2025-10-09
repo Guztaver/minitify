@@ -26,6 +26,15 @@ CREATE TABLE artists
     CONSTRAINT pk_artists PRIMARY KEY (id)
 );
 
+CREATE TABLE music_access
+(
+    id          UUID                        NOT NULL,
+    user_id     UUID                        NOT NULL,
+    music_id    UUID                        NOT NULL,
+    accessed_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    CONSTRAINT pk_music_access PRIMARY KEY (id)
+);
+
 CREATE TABLE musics
 (
     id       UUID         NOT NULL,
@@ -41,11 +50,20 @@ CREATE TABLE user_roles
     roles   VARCHAR(255)
 );
 
+ALTER TABLE music_access
+    ADD CONSTRAINT uc_ec271a0e6c55ac40ee5432c07 UNIQUE (user_id, music_id);
+
 ALTER TABLE albums
     ADD CONSTRAINT FK_ALBUMS_ON_ARTIST FOREIGN KEY (artist_id) REFERENCES artists (id);
 
 ALTER TABLE musics
     ADD CONSTRAINT FK_MUSICS_ON_ALBUM FOREIGN KEY (album_id) REFERENCES albums (id);
+
+ALTER TABLE music_access
+    ADD CONSTRAINT FK_MUSIC_ACCESS_ON_MUSIC FOREIGN KEY (music_id) REFERENCES musics (id);
+
+ALTER TABLE music_access
+    ADD CONSTRAINT FK_MUSIC_ACCESS_ON_USER FOREIGN KEY (user_id) REFERENCES app_users (id);
 
 ALTER TABLE user_roles
     ADD CONSTRAINT fk_user_roles_on_user FOREIGN KEY (user_id) REFERENCES app_users (id);

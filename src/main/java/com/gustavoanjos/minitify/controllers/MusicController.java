@@ -1,5 +1,6 @@
 package com.gustavoanjos.minitify.controllers;
 
+import com.gustavoanjos.minitify.domain.aspects.TrackMusicAccess;
 import com.gustavoanjos.minitify.domain.product.music.Music;
 import com.gustavoanjos.minitify.domain.product.music.MusicDTO;
 import com.gustavoanjos.minitify.domain.repositories.MusicRepository;
@@ -52,6 +53,7 @@ public class MusicController {
             @ApiResponse(responseCode = "404", description = "Music not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    @TrackMusicAccess
     public ResponseEntity<Music> getMusicById(@PathVariable UUID id) {
         log.info("Fetching music with ID: {}", id);
         var music = repository.findById(id)
