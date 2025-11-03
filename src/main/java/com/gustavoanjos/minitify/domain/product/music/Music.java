@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 public class Music {
     @Id
     private String id;

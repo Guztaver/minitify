@@ -50,7 +50,7 @@ public class LoginController {
         if (data.password().isEmpty()) return ResponseEntity.badRequest().body("Password is required");
 
         var user = repository.findByEmail(data.email()).orElseThrow(
-                () -> new IllegalIdentifierException("Email not found")
+                () -> new IllegalArgumentException("Email not found")
         );
 
         if (!passwordEncoder.matches(data.password(), user.getPassword())) return ResponseEntity.badRequest().body("Invalid email or password");

@@ -11,6 +11,8 @@ import java.util.Optional;
 @Repository
 public interface MusicAccessRepository extends MongoRepository<MusicAccess, String> {
     Optional<MusicAccess> findByUserIdAndMusicId(String userId, String musicId);
+    
+    Optional<MusicAccess> findByUser_IdAndMusic_Id(String userId, String musicId);
 
     long countByMusic_Id(String musicId);
 

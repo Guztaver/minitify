@@ -47,6 +47,13 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // API documentation endpoints (Scalar only)
+                        .requestMatchers(
+                                "/openapi.json",
+                                "/docs/**",
+                                "/actuator/**"
+                        ).permitAll()
+                        // Application endpoints
                         .requestMatchers(HttpMethod.POST, "/artists").hasRole(String.valueOf(Roles.ADMIN))
                         .requestMatchers(HttpMethod.POST, "/albums").hasRole(String.valueOf(Roles.USER))
                         .anyRequest().permitAll()

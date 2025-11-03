@@ -43,3 +43,18 @@ clean:
 # Rebuild and restart
 restart: build up
 	@echo "✅ Services restarted with new image"
+
+# Deploy to Fly.io (GRU region - cheapest)
+fly-deploy:
+	@echo "🚀 Deploying to Fly.io (GRU region)..."
+	./deploy-fly.sh
+
+# Deploy to Fly.io with custom app name
+fly-deploy-custom:
+	@if [ -z "$(APP_NAME)" ]; then \
+		echo "❌ Please set APP_NAME environment variable"; \
+		echo "Usage: APP_NAME=myapp make fly-deploy-custom"; \
+		exit 1; \
+	fi
+	@echo "🚀 Deploying $(APP_NAME) to Fly.io (GRU region)..."
+	APP_NAME=$(APP_NAME) ./deploy-fly.sh

@@ -1,0 +1,43 @@
+# fly.toml app configuration file generated for minitify on 2025-11-03T09:25:45-03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'minitify'
+primary_region = 'gru'
+
+[build]
+  dockerfile = 'Dockerfile'
+
+[env]
+  SPRING_DATA_MONGODB_URI = "mongodb://minitify_admin:dGguHuvNN6gTdJlL9Oa9lXK4G093or9AyUYlfxl5W0Y=@131.108.73.167:27018/minitify_db?authSource=admin"
+
+[[services]]
+  protocol = ''
+  internal_port = 8080
+
+  [[services.ports]]
+    port = 80
+    handlers = ['http']
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ['http', 'tls']
+
+  [services.concurrency]
+    type = 'connections'
+    hard_limit = 25
+    soft_limit = 20
+
+  [[services.tcp_checks]]
+
+  [[services.http_checks]]
+    method = 'get'
+    path = '/actuator/health'
+    protocol = 'http'
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1

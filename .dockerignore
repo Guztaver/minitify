@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+
+# Gradle
+.gradle
+build/
+!build/libs/
+gradlew
+gradlew.bat
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Documentation
+README.md
+*.md
+
+# Test
+test/
+src/test/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Docker files
+Dockerfile*
+docker-compose*.yml
+fly.toml
+deploy-*.sh

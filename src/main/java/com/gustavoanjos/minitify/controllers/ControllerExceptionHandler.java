@@ -2,7 +2,6 @@ package com.gustavoanjos.minitify.controllers;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import java.lang.IllegalArgumentException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,13 +15,6 @@ import java.util.Map;
 @Slf4j
 @ControllerAdvice(basePackages = "com.gustavoanjos.minitify.controllers")
 public class ControllerExceptionHandler {
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Object> handleIllegalArgumentException(
-            @NotNull IllegalArgumentException ex, WebRequest request) {
-        log.error("IllegalArgumentException: {}", ex.getMessage());
-        return buildErrorResponse(ex.getMessage(), request);
-    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handleIllegalArgumentException(
@@ -51,4 +43,3 @@ public class ControllerExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 }
-
