@@ -9,8 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.UUID;
-
 @Slf4j
 @Service
 public class ArtistService {
@@ -21,11 +19,11 @@ public class ArtistService {
         this.repository = repository;
     }
 
-    public void deleteArtist(UUID id) {
+    public void deleteArtist(String id) {
         repository.findById(id).ifPresent(repository::delete);
     }
 
-    public Artist updateArtist(UUID id, ArtistDTO artistDTO) throws IllegalArgumentException {
+    public Artist updateArtist(String id, ArtistDTO artistDTO) throws IllegalArgumentException {
         return repository.findById(id)
                 .map(artist -> {
                     artist.setName(artistDTO.name());

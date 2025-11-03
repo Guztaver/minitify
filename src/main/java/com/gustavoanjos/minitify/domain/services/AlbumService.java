@@ -4,11 +4,9 @@ import com.gustavoanjos.minitify.domain.product.album.Album;
 import com.gustavoanjos.minitify.domain.product.album.AlbumDTO;
 import com.gustavoanjos.minitify.domain.repositories.AlbumRepository;
 import com.gustavoanjos.minitify.domain.repositories.ArtistRepository;
-import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 public class AlbumService {
@@ -23,7 +21,7 @@ public class AlbumService {
 
     public void createAlbum(AlbumDTO.WithArtistId data) {
         var artist = artistRepository.findById(data.artistId())
-                .orElseThrow(() -> new EntityNotFoundException("Artist not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Artist not found"));
 
         var album = new Album(
                 data.title(),
@@ -34,11 +32,11 @@ public class AlbumService {
         repository.save(album);
     }
 
-    public void delete(UUID id) {
+    public void delete(String id) {
         repository.findById(id).ifPresent(repository::delete);
     }
 
-    public void update(UUID existingAlbumId, AlbumDTO.WithArtistId data) {
+    public void update(String existingAlbumId, AlbumDTO.WithArtistId data) {
         repository.save(repository.findById(existingAlbumId).map(
                 a -> {
                     a.setTitle(data.title());
@@ -46,6 +44,6 @@ public class AlbumService {
                     a.setReleaseYear(data.releaseYear());
                     return repository.save(a);
                 }
-        ).orElseThrow(() -> new EntityNotFoundException("Album not found")));
+        ).orElseThrow(() -> new ResourceNotFoundException("Album not found")));
     }
 }

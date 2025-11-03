@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -71,7 +70,7 @@ public class ArtistController {
             @ApiResponse(responseCode = "403", description = "Access denied - Admin role required")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteArtist(@PathVariable @Validated UUID id) {
+    public ResponseEntity<HttpStatus> deleteArtist(@PathVariable @Validated String id) {
         log.info("Deleting artist with ID: {}", id);
         service.deleteArtist(id);
         return ResponseEntity.noContent().build();
@@ -85,7 +84,7 @@ public class ArtistController {
     @PutMapping("/{id}")
     public ResponseEntity<ArtistDTO> updateArtist(
             @RequestBody @Validated ArtistDTO artistDTO,
-            @PathVariable @Validated UUID id
+            @PathVariable @Validated String id
     ) {
         log.info("Updating artist with ID: {}", id);
         var updatedArtist = service.updateArtist(id, artistDTO);
@@ -98,7 +97,7 @@ public class ArtistController {
             @ApiResponse(responseCode = "404", description = "Artist not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<ArtistDTO> findById(@PathVariable @Validated UUID id) {
+    public ResponseEntity<ArtistDTO> findById(@PathVariable @Validated String id) {
         log.info("Finding artist with ID: {}", id);
         var artist = repository.findById(id).orElseThrow(
                 () -> new RuntimeException("Artist not found with ID: " + id)
@@ -112,7 +111,7 @@ public class ArtistController {
             @ApiResponse(responseCode = "404", description = "Artist not found")
     })
     @GetMapping("/{id}/albums")
-    public ResponseEntity<Set<Album>> getArtistAlbums(@PathVariable @Validated UUID id, AlbumService albumService) {
+    public ResponseEntity<Set<Album>> getArtistAlbums(@PathVariable @Validated String id, AlbumService albumService) {
         var artist = repository.findById(id).orElseThrow(
                 () -> new RuntimeException("Artist not found with ID: " + id)
         );

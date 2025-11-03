@@ -8,12 +8,10 @@ import com.gustavoanjos.minitify.domain.product.user.User;
 import com.gustavoanjos.minitify.domain.repositories.MusicAccessRepository;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,8 +40,8 @@ public class MusicAccessService {
                 .ifPresent(pair -> {
                     User u = (User) pair[0];
                     Music m = (Music) pair[1];
-                    UUID userId = u.getId();
-                    UUID musicId = m.getId();
+                    String userId = u.getId();
+                    String musicId = m.getId();
                     repository.findByUser_IdAndMusic_Id(userId, musicId)
                             .ifPresentOrElse(
                                     existing -> log.debug("Access already recorded for user {} music {}", userId, musicId),
@@ -55,7 +53,7 @@ public class MusicAccessService {
                 });
     }
 
-    public long countForMusic(UUID musicId) {
+    public long countForMusic(String musicId) {
         return repository.countByMusic_Id(musicId);
     }
 
@@ -63,11 +61,10 @@ public class MusicAccessService {
      * Return a list of trending music with metadata, ordered by access count desc.
      */
     public List<TrendingMusicDTO> trending(int limit) {
-        var page = PageRequest.of(0, Math.max(1, limit));
-        return repository.findTrending(page).stream()
+        return repository.findTrending(Math.max(1, limit)).stream()
                 .map(row -> {
-                    UUID musicId = (UUID) row[0];
-                    Long count = ((Number) row[1]).longValue();
+                    String musicId = row.getId();
+                    Long count = row.getCount();
                     return musicService.getRepository().findById(musicId)
                             .map(music -> new TrendingMusicDTO(
                                     musicId,
@@ -79,6 +76,4 @@ public class MusicAccessService {
                 })
                 .collect(Collectors.toList());
     }
-
-
 }

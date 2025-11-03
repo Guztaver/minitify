@@ -1,0 +1,15 @@
+services:
+  minitify:
+    environment:
+      - 'SPRING_PROFILES_ACTIVE=dev'
+      - 'LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=DEBUG'
+      - 'LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_DATA_MONGODB_CORE_MONGOTEMPLATE=DEBUG'
+    volumes:
+      - ./src/main/resources:/app/resources:ro
+    ports:
+      - "8080:8080"
+      - "5005:5005"  # Debug port
+
+  mongodb:
+    ports:
+      - "27018:27017"

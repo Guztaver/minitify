@@ -7,8 +7,6 @@ import com.gustavoanjos.minitify.domain.repositories.MusicRepository;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 public class MusicService {
     private final AlbumService albumService;
@@ -22,7 +20,8 @@ public class MusicService {
 
     public void createMusic(MusicDTO.WithAlbumId data) {
         var albumRepository = albumService.getRepository();
-        Album album = albumRepository.getReferenceById(data.albumId());
+        Album album = albumRepository.findById(data.albumId())
+                .orElseThrow(() -> new IllegalArgumentException("Album not found"));
         var music = new Music(
                 data.title(),
                 album,
@@ -34,7 +33,8 @@ public class MusicService {
 
     public void updateMusic(Music existingMusic, MusicDTO.WithAlbumId data) {
         var albumRepository = albumService.getRepository();
-        Album album = albumRepository.getReferenceById(data.albumId());
+        Album album = albumRepository.findById(data.albumId())
+                .orElseThrow(() -> new IllegalArgumentException("Album not found"));
 
         existingMusic.setTitle(data.title());
         existingMusic.setAlbum(album);
@@ -43,7 +43,7 @@ public class MusicService {
         repository.save(existingMusic);
     }
 
-    public void deleteMusic(UUID id) {
+    public void deleteMusic(String id) {
         repository.findById(id).ifPresent(repository::delete);
     }
 }

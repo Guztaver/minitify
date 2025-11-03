@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 public record PlaylistDTO(
@@ -31,10 +30,10 @@ public record PlaylistDTO(
     }
 
     public record Response(
-            UUID id,
+            String id,
             String name,
             String description,
-            UUID ownerId,
+            String ownerId,
             String ownerName,
             boolean isPublic,
             int musicCount,
@@ -59,10 +58,10 @@ public record PlaylistDTO(
     }
 
     public record WithMusics(
-            UUID id,
+            String id,
             String name,
             String description,
-            UUID ownerId,
+            String ownerId,
             String ownerName,
             boolean isPublic,
             List<MusicInfo> musics,
@@ -91,10 +90,10 @@ public record PlaylistDTO(
     }
 
     public record MusicInfo(
-            UUID id,
+            String id,
             String title,
             int duration,
-            UUID albumId,
+            String albumId,
             String albumTitle
     ) {
         public static MusicInfo fromMusic(Music music) {
@@ -123,7 +122,7 @@ public record PlaylistDTO(
     }
 
     public record AddMusicRequest(
-            @NotNull UUID musicId
+            @NotNull String musicId
     ) {
     }
 }

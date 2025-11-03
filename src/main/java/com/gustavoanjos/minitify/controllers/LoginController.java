@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.boot.model.naming.IllegalIdentifierException;
+import java.lang.IllegalArgumentException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,7 +50,7 @@ public class LoginController {
         if (data.password().isEmpty()) return ResponseEntity.badRequest().body("Password is required");
 
         var user = repository.findByEmail(data.email()).orElseThrow(
-                () -> new IllegalIdentifierException("Email not found")
+                () -> new IllegalArgumentException("Email not found")
         );
 
         if (!passwordEncoder.matches(data.password(), user.getPassword())) return ResponseEntity.badRequest().body("Invalid email or password");

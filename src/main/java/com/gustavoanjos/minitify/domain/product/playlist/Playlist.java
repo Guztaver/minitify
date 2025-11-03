@@ -2,62 +2,49 @@ package com.gustavoanjos.minitify.domain.product.playlist;
 
 import com.gustavoanjos.minitify.domain.product.music.Music;
 import com.gustavoanjos.minitify.domain.product.user.User;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-@Entity
-@Table(name = "playlists")
+@Document(collection = "playlists")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuppressWarnings({"JpaDataSourceORMInspection"})
 public class Playlist {
 
     @Id
-    @GeneratedValue
-    private UUID id;
+    private String id;
 
     @Setter
     @NotNull
-    @Column(nullable = false)
     private String name;
 
     @Setter
-    @Column(length = 500)
     private String description;
 
     @Setter
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @DBRef
     @NotNull
     private User owner;
 
     @Setter
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "playlist_musics",
-            joinColumns = @JoinColumn(name = "playlist_id"),
-            inverseJoinColumns = @JoinColumn(name = "music_id")
-    )
+    @DBRef
     private List<Music> musics = new ArrayList<>();
 
     @Setter
-    @Column(nullable = false)
     private boolean isPublic = true;
 
-    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     public Playlist(String name, String description, User owner, boolean isPublic) {
@@ -70,16 +57,6 @@ public class Playlist {
         this.updatedAt = LocalDateTime.now();
     }
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 
     public void addMusic(Music music) {
         if (!this.musics.contains(music)) {

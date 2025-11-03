@@ -2,35 +2,33 @@ package com.gustavoanjos.minitify.domain.repositories;
 
 import com.gustavoanjos.minitify.domain.product.playlist.Playlist;
 import com.gustavoanjos.minitify.domain.product.user.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface PlaylistRepository extends JpaRepository<Playlist, UUID> {
+public interface PlaylistRepository extends MongoRepository<Playlist, String> {
 
     List<Playlist> findByOwner(User owner);
 
-    List<Playlist> findByOwnerId(UUID ownerId);
+    List<Playlist> findByOwnerId(String ownerId);
 
     List<Playlist> findByIsPublicTrue();
 
-    Optional<Playlist> findByIdAndOwner(UUID id, User owner);
+    Optional<Playlist> findByIdAndOwner(String id, User owner);
 
     @SuppressWarnings("unused")
-    Optional<Playlist> findByIdAndOwnerId(UUID id, UUID ownerId);
+    Optional<Playlist> findByIdAndOwnerId(String id, String ownerId);
 
-    @Query("SELECT p FROM Playlist p WHERE p.isPublic = true OR p.owner.id = :userId")
-    List<Playlist> findAllAccessibleByUser(@Param("userId") UUID userId);
+    @Query("{ '$or': [ { 'isPublic': true }, { 'owner.$id': ?0 } ] }")
+    List<Playlist> findAllAccessibleByUser(String userId);
 
     @SuppressWarnings("unused")
-    @Query("SELECT p FROM Playlist p JOIN p.musics m WHERE m.id = :musicId AND (p.isPublic = true OR p.owner.id = :userId)")
-    List<Playlist> findByMusicIdAndAccessibleByUser(@Param("musicId") UUID musicId, @Param("userId") UUID userId);
+    @Query("{ 'musics.$id': ?0, '$or': [ { 'isPublic': true }, { 'owner.$id': ?1 } ] }")
+    List<Playlist> findByMusicIdAndAccessibleByUser(String musicId, String userId);
 
-    long countByOwnerId(UUID ownerId);
+    long countByOwnerId(String ownerId);
 }

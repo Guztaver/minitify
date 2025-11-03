@@ -82,12 +82,12 @@ public class MusicAccessAspect {
                         return Optional.of(music).stream();
                     }
                     if (arg instanceof UUID id) {
-                        return musicAccessService.getMusicService().getRepository().findById(id).stream();
+                        return musicAccessService.getMusicService().getRepository().findById(id.toString()).stream();
                     }
                     if (arg instanceof String str) {
                         try {
                             UUID id = UUID.fromString(str);
-                            return musicAccessService.getMusicService().getRepository().findById(id).stream();
+                            return musicAccessService.getMusicService().getRepository().findById(id.toString()).stream();
                         } catch (IllegalArgumentException ignored) {
                             return Optional.<Music>empty().stream();
                         }

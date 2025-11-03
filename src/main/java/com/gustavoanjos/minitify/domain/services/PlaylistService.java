@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -42,7 +41,7 @@ public class PlaylistService {
     }
 
     @Transactional(readOnly = true)
-    public List<Playlist> getPlaylistsByUserId(UUID userId) {
+    public List<Playlist> getPlaylistsByUserId(String userId) {
         return repository.findByOwnerId(userId);
     }
 
@@ -52,24 +51,24 @@ public class PlaylistService {
     }
 
     @Transactional(readOnly = true)
-    public List<Playlist> getAllAccessibleByUser(UUID userId) {
+    public List<Playlist> getAllAccessibleByUser(String userId) {
         return repository.findAllAccessibleByUser(userId);
     }
 
     @Transactional(readOnly = true)
-    public Playlist getPlaylistById(UUID playlistId) {
+    public Playlist getPlaylistById(String playlistId) {
         return repository.findById(playlistId)
                 .orElseThrow(() -> new RuntimeException("Playlist not found with ID: " + playlistId));
     }
 
     @Transactional(readOnly = true)
-    public Playlist getPlaylistByIdAndOwner(UUID playlistId, User owner) {
+    public Playlist getPlaylistByIdAndOwner(String playlistId, User owner) {
         return repository.findByIdAndOwner(playlistId, owner)
                 .orElseThrow(() -> new RuntimeException("Playlist not found or you don't have access to it"));
     }
 
     @Transactional
-    public Playlist updatePlaylist(UUID playlistId, User owner, String name, String description, Boolean isPublic) {
+    public Playlist updatePlaylist(String playlistId, User owner, String name, String description, Boolean isPublic) {
         Playlist playlist = getPlaylistByIdAndOwner(playlistId, owner);
 
         if (name != null && !name.isBlank()) {
@@ -88,14 +87,14 @@ public class PlaylistService {
     }
 
     @Transactional
-    public void deletePlaylist(UUID playlistId, User owner) {
+    public void deletePlaylist(String playlistId, User owner) {
         Playlist playlist = getPlaylistByIdAndOwner(playlistId, owner);
         repository.delete(playlist);
         log.info("Deleted playlist: {} by user: {}", playlistId, owner.getId());
     }
 
     @Transactional
-    public Playlist addMusicToPlaylist(UUID playlistId, UUID musicId, User owner) {
+    public Playlist addMusicToPlaylist(String playlistId, String musicId, User owner) {
         Playlist playlist = getPlaylistByIdAndOwner(playlistId, owner);
         Music music = musicService.getRepository().findById(musicId)
                 .orElseThrow(() -> new RuntimeException("Music not found with ID: " + musicId));
@@ -107,7 +106,7 @@ public class PlaylistService {
     }
 
     @Transactional
-    public Playlist removeMusicFromPlaylist(UUID playlistId, UUID musicId, User owner) {
+    public Playlist removeMusicFromPlaylist(String playlistId, String musicId, User owner) {
         Playlist playlist = getPlaylistByIdAndOwner(playlistId, owner);
         Music music = musicService.getRepository().findById(musicId)
                 .orElseThrow(() -> new RuntimeException("Music not found with ID: " + musicId));
@@ -119,7 +118,7 @@ public class PlaylistService {
     }
 
     @Transactional(readOnly = true)
-    public boolean canUserAccessPlaylist(UUID playlistId, User user) {
+    public boolean canUserAccessPlaylist(String playlistId, User user) {
         return repository.findById(playlistId)
                 .map(playlist -> playlist.isPublic() || playlist.getOwner().getId().equals(user.getId()))
                 .orElse(false);
@@ -127,7 +126,7 @@ public class PlaylistService {
 
     @SuppressWarnings("unused")
     @Transactional(readOnly = true)
-    public long countPlaylistsByUser(UUID userId) {
+    public long countPlaylistsByUser(String userId) {
         return repository.countByOwnerId(userId);
     }
 }
