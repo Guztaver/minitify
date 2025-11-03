@@ -1,14 +1,53 @@
 services:
-  postgres:
-    image: 'postgres:15'
+  mongodb:
+    image: 'mongo:8'
+    container_name: minitify-mongodb
     environment:
-      - 'POSTGRES_DB=minitify'
-      - 'POSTGRES_PASSWORD=minitify'
-      - 'POSTGRES_USER=minitify'
+      - 'MONGO_INITDB_DATABASE=minitify'
+      - 'MONGO_INITDB_ROOT_USERNAME=minitify'
+      - 'MONGO_INITDB_ROOT_PASSWORD=minitify'
     ports:
-      - "5432:5432"
+      - "27018:27017"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mongo_data:/data/db
+    networks:
+      - minitify-network
+    restart: unless-stopped
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  minitify:
+    image: 'guztaver/minitify:latest'
+    container_name: minitify-app
+    ports:
+      - "8080:8080"
+    environment:
+      - 'SPRING_DATA_MONGODB_URI=mongodb://minitify:minitify@mongodb:27017/minitify'
+      - 'SPRING_DATA_MONGODB_DATABASE=minitify'
+      - 'SECURITY_JWT_SHARED-SECRET=my-secret-key-that-is-at-least-256-bits-long-for-hs256'
+      - 'SECURITY_JWT_ISSUER=minitify'
+      - 'SECURITY_JWT_EXPIRATION-MS=3600000'
+      - 'APP_URL=http://localhost:8080'
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - minitify-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
-  postgres_data:
+  mongo_data:
+    driver: local
+
+networks:
+  minitify-network:
+    driver: bridge

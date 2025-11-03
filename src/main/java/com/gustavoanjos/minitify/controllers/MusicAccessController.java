@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping
@@ -33,7 +32,7 @@ public class MusicAccessController {
             @ApiResponse(responseCode = "200", description = "Count returned"),
             @ApiResponse(responseCode = "404", description = "Music not found")
     })
-    public ResponseEntity<Map<String, Serializable>> countForMusic(@PathVariable UUID id) {
+    public ResponseEntity<Map<String, Serializable>> countForMusic(@PathVariable String id) {
         long count = musicAccessService.countForMusic(id);
         return ResponseEntity.ok(Map.of("musicId", id, "count", count));
     }

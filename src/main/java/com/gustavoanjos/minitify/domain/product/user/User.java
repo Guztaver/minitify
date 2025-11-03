@@ -1,12 +1,14 @@
 package com.gustavoanjos.minitify.domain.product.user;
 
 import com.gustavoanjos.minitify.domain.product.enums.Roles;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,8 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Entity
-@Table(name = "app_users")
+@Document(collection = "app_users")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,24 +32,21 @@ public class User implements UserDetails {
     private static final String BCRYPT_PREFIX_2Y = "$2y$";
 
     @Id
-    @GeneratedValue
-    private UUID id;
+    private String id;
 
     @Setter
     @NotNull
     private String name;
+
     @Setter
     @NotNull
+    @Indexed(unique = true)
     private String email;
 
-    @Column(nullable = false)
     @NotNull
     private String password;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
-    @Enumerated(EnumType.STRING)
-    private final Set<Roles> roles = new HashSet<>();
+    private Set<Roles> roles = new HashSet<>();
 
     public User(String name, String email, String password) {
         this.name = name;

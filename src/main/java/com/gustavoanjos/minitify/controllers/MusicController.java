@@ -16,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @Slf4j
 @RestController
 @RequestMapping("/musics")
@@ -54,7 +52,7 @@ public class MusicController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @TrackMusicAccess
-    public ResponseEntity<Music> getMusicById(@PathVariable UUID id) {
+    public ResponseEntity<Music> getMusicById(@PathVariable String id) {
         log.info("Fetching music with ID: {}", id);
         var music = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Music not found"));
@@ -81,7 +79,7 @@ public class MusicController {
             @ApiResponse(responseCode = "404", description = "Music not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<HttpStatus> updateMusic(@PathVariable UUID id, @Validated @RequestBody MusicDTO.WithAlbumId data) {
+    public ResponseEntity<HttpStatus> updateMusic(@PathVariable String id, @Validated @RequestBody MusicDTO.WithAlbumId data) {
         log.info("Updating music with ID: {}", id);
         var existingMusic = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Music not found"));
@@ -96,24 +94,9 @@ public class MusicController {
             @ApiResponse(responseCode = "404", description = "Music not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<HttpStatus> deleteMusic(@PathVariable UUID id) {
+    public ResponseEntity<HttpStatus> deleteMusic(@PathVariable String id) {
         log.info("Deleting music with ID: {}", id);
         musicService.deleteMusic(id);
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/{id}/album")
-    @Operation(summary = "Get album of a music track", description = "Retrieves the album associated with a music track by its ID")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Album retrieved successfully"),
-            @ApiResponse(responseCode = "404", description = "Music or Album not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public ResponseEntity<?> getAlbumByMusicId(@PathVariable UUID id) {
-        log.info("Fetching album for music with ID: {}", id);
-        var music = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Music not found"));
-        var album = music.getAlbum();
-        return ResponseEntity.ok(album);
     }
 }

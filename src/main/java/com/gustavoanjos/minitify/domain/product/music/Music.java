@@ -2,32 +2,33 @@ package com.gustavoanjos.minitify.domain.product.music;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gustavoanjos.minitify.domain.product.album.Album;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
-import java.util.UUID;
-
-@Entity
+@Document(collection = "musics")
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "musics")
 @Getter
 public class Music {
     @Id
-    @GeneratedValue
-    private UUID id;
+    private String id;
+
     @Setter
     @NotNull
     private String title;
+
     @Setter
     @NotNull
     private int duration;
+
     @Setter
-    @ManyToOne(fetch = FetchType.LAZY)
+    @DBRef
     @JsonBackReference
     @NotNull
     private Album album;

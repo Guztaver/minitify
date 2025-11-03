@@ -19,7 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -110,7 +109,7 @@ public class PlaylistController {
             @ApiResponse(responseCode = "403", description = "Access denied")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<PlaylistDTO.WithMusics> getPlaylistById(@PathVariable UUID id) {
+    public ResponseEntity<PlaylistDTO.WithMusics> getPlaylistById(@PathVariable String id) {
         User currentUser = getCurrentUser();
         Playlist playlist = playlistService.getPlaylistById(id);
 
@@ -130,7 +129,7 @@ public class PlaylistController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<PlaylistDTO.Response> updatePlaylist(
-            @PathVariable UUID id,
+            @PathVariable String id,
             @Valid @RequestBody PlaylistDTO.UpdateRequest request) {
         User currentUser = getCurrentUser();
 
@@ -152,7 +151,7 @@ public class PlaylistController {
             @ApiResponse(responseCode = "403", description = "Access denied")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePlaylist(@PathVariable UUID id) {
+    public ResponseEntity<Void> deletePlaylist(@PathVariable String id) {
         User currentUser = getCurrentUser();
         playlistService.deletePlaylist(id, currentUser);
         return ResponseEntity.noContent().build();
@@ -166,7 +165,7 @@ public class PlaylistController {
     })
     @PostMapping("/{id}/musics")
     public ResponseEntity<PlaylistDTO.WithMusics> addMusicToPlaylist(
-            @PathVariable UUID id,
+            @PathVariable String id,
             @Valid @RequestBody PlaylistDTO.AddMusicRequest request) {
         User currentUser = getCurrentUser();
 
@@ -183,8 +182,8 @@ public class PlaylistController {
     })
     @DeleteMapping("/{id}/musics/{musicId}")
     public ResponseEntity<PlaylistDTO.WithMusics> removeMusicFromPlaylist(
-            @PathVariable UUID id,
-            @PathVariable UUID musicId) {
+            @PathVariable String id,
+            @PathVariable String musicId) {
         User currentUser = getCurrentUser();
 
         Playlist updated = playlistService.removeMusicFromPlaylist(id, musicId, currentUser);
@@ -197,7 +196,7 @@ public class PlaylistController {
             @ApiResponse(responseCode = "200", description = "Playlists retrieved successfully")
     })
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<PlaylistDTO.Response>> getPlaylistsByUserId(@PathVariable UUID userId) {
+    public ResponseEntity<List<PlaylistDTO.Response>> getPlaylistsByUserId(@PathVariable String userId) {
         List<PlaylistDTO.Response> playlists = playlistService.getPlaylistsByUserId(userId)
                 .stream()
                 .filter(Playlist::isPublic)
@@ -214,4 +213,3 @@ public class PlaylistController {
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
     }
 }
-

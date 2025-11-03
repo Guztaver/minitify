@@ -4,11 +4,9 @@ import com.gustavoanjos.minitify.domain.product.album.Album;
 import com.gustavoanjos.minitify.domain.product.album.AlbumDTO;
 import com.gustavoanjos.minitify.domain.repositories.AlbumRepository;
 import com.gustavoanjos.minitify.domain.repositories.ArtistRepository;
-import jakarta.persistence.EntityNotFoundException;
+import javax.persistence.EntityNotFoundException;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 public class AlbumService {
@@ -34,11 +32,11 @@ public class AlbumService {
         repository.save(album);
     }
 
-    public void delete(UUID id) {
+    public void delete(String id) {
         repository.findById(id).ifPresent(repository::delete);
     }
 
-    public void update(UUID existingAlbumId, AlbumDTO.WithArtistId data) {
+    public void update(String existingAlbumId, AlbumDTO.WithArtistId data) {
         repository.save(repository.findById(existingAlbumId).map(
                 a -> {
                     a.setTitle(data.title());

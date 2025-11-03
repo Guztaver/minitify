@@ -4,8 +4,6 @@ import com.gustavoanjos.minitify.domain.product.DTO;
 import com.gustavoanjos.minitify.domain.product.album.Album;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.UUID;
-
 public record MusicDTO(String title, @Validated Album album, int duration) implements DTO<Music> {
     @Override
     public Music toEntity() {
@@ -16,6 +14,6 @@ public record MusicDTO(String title, @Validated Album album, int duration) imple
         );
     }
 
-    public record WithAlbumId(String title, UUID albumId, int duration) {
+    public record WithAlbumId(String title, String albumId, int duration) {
     }
 }

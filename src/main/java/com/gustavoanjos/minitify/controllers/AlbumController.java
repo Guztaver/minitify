@@ -14,7 +14,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -66,7 +65,7 @@ public class AlbumController {
             @ApiResponse(responseCode = "200", description = "Album retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "Album not found")
     })
-    public ResponseEntity<AlbumDTO> getAlbumById(@PathVariable UUID id) {
+    public ResponseEntity<AlbumDTO> getAlbumById(@PathVariable String id) {
         var album = repository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("Album with id " + id + " not found")
         );
@@ -80,7 +79,7 @@ public class AlbumController {
             @ApiResponse(responseCode = "204", description = "Deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Album not found")
     })
-    public ResponseEntity<HttpStatus> deleteAlbumById(@PathVariable UUID id) {
+    public ResponseEntity<HttpStatus> deleteAlbumById(@PathVariable String id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
@@ -92,7 +91,7 @@ public class AlbumController {
             @ApiResponse(responseCode = "400", description = "Invalid album data provided"),
             @ApiResponse(responseCode = "404", description = "Album not found")
     })
-    public ResponseEntity<AlbumDTO> updateAlbum(@PathVariable UUID id, @Validated @RequestBody AlbumDTO.WithArtistId data) {
+    public ResponseEntity<AlbumDTO> updateAlbum(@PathVariable String id, @Validated @RequestBody AlbumDTO.WithArtistId data) {
         var album = repository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("Album with id " + id + " not found")
         );

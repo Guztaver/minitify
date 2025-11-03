@@ -2,7 +2,7 @@ package com.gustavoanjos.minitify.controllers;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.boot.model.naming.IllegalIdentifierException;
+import java.lang.IllegalArgumentException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,10 +17,10 @@ import java.util.Map;
 @ControllerAdvice(basePackages = "com.gustavoanjos.minitify.controllers")
 public class ControllerExceptionHandler {
 
-    @ExceptionHandler(IllegalIdentifierException.class)
-    public ResponseEntity<Object> handleIllegalIdentifierException(
-            @NotNull IllegalIdentifierException ex, WebRequest request) {
-        log.error("IllegalIdentifierException: {}", ex.getMessage());
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgumentException(
+            @NotNull IllegalArgumentException ex, WebRequest request) {
+        log.error("IllegalArgumentException: {}", ex.getMessage());
         return buildErrorResponse(ex.getMessage(), request);
     }
 
