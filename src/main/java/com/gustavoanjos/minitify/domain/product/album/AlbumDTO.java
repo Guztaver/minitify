@@ -21,7 +21,6 @@ public record AlbumDTO(String title, @Validated Artist artist, String genre, @Va
 
     public static AlbumDTO fromAlbum(Album album) {
         return new AlbumDTO(
-                album.getId(),
                 album.getTitle(),
                 album.getArtist(),
                 album.getGenre(),

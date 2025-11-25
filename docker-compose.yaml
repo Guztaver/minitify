@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:8.2
+    container_name: minitify-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=minitify
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+  minitify:
+    image: guztaver/minitify:latest
+    container_name: minitify-app
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://admin:password@mongodb:27017/minitify?authSource=admin
+      - SPRING_PROFILES_ACTIVE=docker
+
+volumes:
+  mongodb_data:
+    driver: local

@@ -8,7 +8,6 @@ public record MusicDTO(String title, @Validated Album album, int duration) imple
     @Override
     public Music toEntity() {
         return new Music(
-                this.getId(),
                 this.title,
                 this.album,
                 this.duration
