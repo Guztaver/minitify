@@ -2,26 +2,22 @@ package com.gustavoanjos.minitify.domain.product.artist;
 
 import com.gustavoanjos.minitify.domain.product.DTO;
 
-public record ArtistDTO(String id, String name, String description, String genre) implements DTO<Artist> {
+public record ArtistDTO(String name, String description, String genre) implements DTO<Artist> {
     @Override
     public Artist toEntity() {
-        Artist artist = new Artist(
+        return new Artist(
                 this.name,
                 this.description,
-                this.genre
-        );
-        if (this.id != null) {
-            artist.id = this.id;
-        }
-        return artist;
+                this.genre);
     }
 
-    public static ArtistDTO fromArtist(Artist artist) {
-        return new ArtistDTO(
-                artist.getId(),
-                artist.getName(),
-                artist.getDescription(),
-                artist.getGenre()
-        );
+    public record Response(String id, String name, String description, String genre) {
+        public static Response fromArtist(Artist artist) {
+            return new Response(
+                    artist.getId(),
+                    artist.getName(),
+                    artist.getDescription(),
+                    artist.getGenre());
+        }
     }
 }
