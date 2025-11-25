@@ -29,7 +29,7 @@ primary_region = 'gru'
     port = 8080
     timeout = "10s"
     type = "http"
-    [checks.health_status]
+    [checks.health_status.headers]
       Content-Type = "application/json"
 
 [[vm]]
