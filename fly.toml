@@ -7,32 +7,32 @@ app = 'minitify'
 primary_region = 'gru'
 
 [build]
-  dockerfile = 'Dockerfile'
+dockerfile = 'Dockerfile'
 
 [env]
-  SPRING_DATA_MONGODB_URI = 'mongodb://minitify_admin:dGguHuvNN6gTdJlL9Oa9lXK4G093or9AyUYlfxl5W0Y=@131.108.73.167:27018/minitify_db?authSource=admin'
+SPRING_DATA_MONGODB_URI = 'mongodb://minitify_admin:dGguHuvNN6gTdJlL9Oa9lXK4G093or9AyUYlfxl5W0Y=@131.108.73.167:27018/minitify_db?authSource=admin'
 
 [http_service]
-  internal_port = 8080
-  force_https = true
-  auto_stop_machines = 'stop'
-  auto_start_machines = true
-  min_machines_running = 0
-  processes = ['app']
+internal_port = 8080
+force_https = true
+auto_stop_machines = 'stop'
+auto_start_machines = true
+min_machines_running = 0
+processes = ['app']
 
 [checks]
-  [checks.health_status]
-    grace_period = "30s"
-    interval = "15s"
-    method = "get"
-    path = "/health"
-    port = 8080
-    timeout = "10s"
-    type = "http"
-    [checks.health_status.headers]
-      Content-Type = "application/json"
+[checks.health_status]
+grace_period = "120s"
+interval = "15s"
+method = "get"
+path = "/health"
+port = 8080
+timeout = "10s"
+type = "http"
+[checks.health_status.headers]
+Content-Type = "application/json"
 
 [[vm]]
-  memory = '1gb'
-  cpu_kind = 'shared'
-  cpus = 1
+memory = '1gb'
+cpu_kind = 'shared'
+cpus = 1

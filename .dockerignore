@@ -6,8 +6,9 @@
 .gradle
 build/
 !build/libs/
-gradlew
-gradlew.bat
+# gradlew and gradlew.bat are needed for building in Docker
+# gradlew
+# gradlew.bat
 
 # IDE
 .idea/

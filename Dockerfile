@@ -1,4 +1,19 @@
-# Simple Dockerfile that packages the application as-is
+# Multi-stage Dockerfile that builds and packages the application
+FROM eclipse-temurin:21-jdk-alpine AS builder
+
+# Install curl and git (if needed for build)
+RUN apk add --no-cache curl git
+
+# Set working directory for build
+WORKDIR /build
+
+# Copy source code
+COPY . .
+
+# Make gradlew executable and build the application
+RUN chmod +x gradlew && ./gradlew bootJar --no-daemon
+
+# Final stage
 FROM eclipse-temurin:21-jre-alpine
 
 # Install curl for health checks
@@ -11,8 +26,8 @@ RUN addgroup -g 1000 -S appuser && \
 # Set working directory
 WORKDIR /app
 
-# Copy the JAR (assuming it's built locally)
-COPY build/libs/minitify-0.1.0-SNAPSHOT.jar /app/minitify.jar
+# Copy the built JAR from builder stage
+COPY --from=builder /build/build/libs/minitify-0.1.0-SNAPSHOT.jar /app/minitify.jar
 
 # Copy application properties
 COPY src/main/resources/application.properties /app/application.properties
